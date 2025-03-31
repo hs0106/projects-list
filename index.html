@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Projects</title>
+        <title>Projects Report</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
                 color: #333;
                 max-width: 1200px;
                 margin: 0 auto;
+                padding-bottom: 70px; /* Space for fixed wishlist button */
             }
             .header {
                 background-color: #f5f5f5;
@@ -20,6 +21,23 @@
                 border-radius: 5px;
                 margin-bottom: 20px;
                 border-bottom: 2px solid #ddd;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .header-left {
+                flex: 1;
+            }
+            .search-container {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            #searchInput {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                width: 250px;
             }
             h1 {
                 color: #2c3e50;
@@ -37,12 +55,17 @@
                 margin-bottom: 20px;
                 background-color: #fff;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            .project.wishlist-item {
+                border-left: 5px solid #3498db;
             }
             .project h2 {
                 color: #3498db;
                 border-bottom: 1px solid #eee;
                 padding-bottom: 10px;
                 margin-top: 0;
+                padding-right: 40px; /* Space for wishlist button */
             }
             .field {
                 margin-bottom: 10px;
@@ -77,6 +100,92 @@
                 padding: 3px 10px;
                 font-size: 0.9em;
                 border: 1px solid #d6eaf8;
+                cursor: pointer;
+            }
+            .keyword-tag:hover, .technique-tag:hover {
+                background-color: #d6eaf8;
+            }
+            .wishlist-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 24px;
+                color: #bdc3c7;
+                transition: color 0.3s;
+            }
+            .wishlist-btn:hover, .wishlist-btn.active {
+                color: #f1c40f;
+            }
+            .wishlist-btn.active {
+                transform: scale(1.1);
+            }
+            .wishlist-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                padding: 10px 20px;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                z-index: 1000;
+            }
+            .wishlist-count {
+                font-weight: bold;
+                color: #3498db;
+            }
+            .wishlist-buttons {
+                display: flex;
+                gap: 10px;
+            }
+            .btn {
+                padding: 8px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s;
+            }
+            .btn-primary {
+                background-color: #3498db;
+                color: white;
+            }
+            .btn-secondary {
+                background-color: #bdc3c7;
+                color: #2c3e50;
+            }
+            .btn:hover {
+                opacity: 0.9;
+            }
+            .view-toggle {
+                margin-left: 20px;
+            }
+            .hidden {
+                display: none;
+            }
+            .filter-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin: 10px 0;
+            }
+            .filter-tag {
+                background-color: #3498db;
+                color: white;
+                border-radius: 15px;
+                padding: 3px 10px;
+                font-size: 0.9em;
+                display: flex;
+                align-items: center;
+            }
+            .filter-tag .remove {
+                margin-left: 5px;
+                cursor: pointer;
             }
             @media print {
                 body {
@@ -86,17 +195,35 @@
                 .project {
                     page-break-inside: avoid;
                 }
+                .wishlist-btn, .wishlist-container, .header .search-container {
+                    display: none;
+                }
             }
         </style>
     </head>
     <body>
         <div class="header">
-            <h1>Projects Report</h1>
-            <div class="timestamp">Generated on: March 31, 2025 22:02:25</div>
+            <div class="header-left">
+                <h1>Projects Report</h1>
+                <div class="timestamp">Generated on: March 31, 2025 22:20:34</div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search projects...">
+                <button id="searchBtn" class="btn btn-primary">Search</button>
+                <div class="view-toggle">
+                    <button id="viewAllBtn" class="btn btn-secondary">All Projects</button>
+                    <button id="viewWishlistBtn" class="btn btn-primary">My Wishlist</button>
+                </div>
+            </div>
         </div>
+        
+        <div id="filterTags" class="filter-tags"></div>
+        
+        <div id="projectsContainer">
     
-        <div class="project">
+        <div class="project" id="project-0" data-index="0" data-keywords="" data-techniques="" data-title="Project #1">
             <h2>Project #1</h2>
+            <button class="wishlist-btn" data-project-id="project-0" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -150,8 +277,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-1" data-index="1" data-keywords="" data-techniques="" data-title="Project #2">
             <h2>Project #2</h2>
+            <button class="wishlist-btn" data-project-id="project-1" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -205,8 +333,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-2" data-index="2" data-keywords="" data-techniques="" data-title="Project #3">
             <h2>Project #3</h2>
+            <button class="wishlist-btn" data-project-id="project-2" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -260,8 +389,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-3" data-index="3" data-keywords="" data-techniques="" data-title="Project #4">
             <h2>Project #4</h2>
+            <button class="wishlist-btn" data-project-id="project-3" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -315,8 +445,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-4" data-index="4" data-keywords="" data-techniques="" data-title="Project #5">
             <h2>Project #5</h2>
+            <button class="wishlist-btn" data-project-id="project-4" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -370,8 +501,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-5" data-index="5" data-keywords="" data-techniques="" data-title="Project #6">
             <h2>Project #6</h2>
+            <button class="wishlist-btn" data-project-id="project-5" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -425,8 +557,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-6" data-index="6" data-keywords="" data-techniques="" data-title="Project #7">
             <h2>Project #7</h2>
+            <button class="wishlist-btn" data-project-id="project-6" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -480,8 +613,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-7" data-index="7" data-keywords="" data-techniques="" data-title="Project #8">
             <h2>Project #8</h2>
+            <button class="wishlist-btn" data-project-id="project-7" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -535,8 +669,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-8" data-index="8" data-keywords="" data-techniques="" data-title="Project #9">
             <h2>Project #9</h2>
+            <button class="wishlist-btn" data-project-id="project-8" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -590,8 +725,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-9" data-index="9" data-keywords="" data-techniques="" data-title="Project #10">
             <h2>Project #10</h2>
+            <button class="wishlist-btn" data-project-id="project-9" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -645,8 +781,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-10" data-index="10" data-keywords="" data-techniques="" data-title="Project #11">
             <h2>Project #11</h2>
+            <button class="wishlist-btn" data-project-id="project-10" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -700,8 +837,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-11" data-index="11" data-keywords="" data-techniques="" data-title="Project #12">
             <h2>Project #12</h2>
+            <button class="wishlist-btn" data-project-id="project-11" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -755,8 +893,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-12" data-index="12" data-keywords="" data-techniques="" data-title="Project #13">
             <h2>Project #13</h2>
+            <button class="wishlist-btn" data-project-id="project-12" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -810,8 +949,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-13" data-index="13" data-keywords="" data-techniques="" data-title="Project #14">
             <h2>Project #14</h2>
+            <button class="wishlist-btn" data-project-id="project-13" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -865,8 +1005,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-14" data-index="14" data-keywords="" data-techniques="" data-title="Project #15">
             <h2>Project #15</h2>
+            <button class="wishlist-btn" data-project-id="project-14" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -920,8 +1061,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-15" data-index="15" data-keywords="" data-techniques="" data-title="Project #16">
             <h2>Project #16</h2>
+            <button class="wishlist-btn" data-project-id="project-15" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -975,8 +1117,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-16" data-index="16" data-keywords="" data-techniques="" data-title="Project #17">
             <h2>Project #17</h2>
+            <button class="wishlist-btn" data-project-id="project-16" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1030,8 +1173,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-17" data-index="17" data-keywords="" data-techniques="" data-title="Project #18">
             <h2>Project #18</h2>
+            <button class="wishlist-btn" data-project-id="project-17" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1085,8 +1229,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-18" data-index="18" data-keywords="" data-techniques="" data-title="Project #19">
             <h2>Project #19</h2>
+            <button class="wishlist-btn" data-project-id="project-18" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1140,8 +1285,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-19" data-index="19" data-keywords="" data-techniques="" data-title="Project #20">
             <h2>Project #20</h2>
+            <button class="wishlist-btn" data-project-id="project-19" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1195,8 +1341,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-20" data-index="20" data-keywords="" data-techniques="" data-title="Project #21">
             <h2>Project #21</h2>
+            <button class="wishlist-btn" data-project-id="project-20" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1250,8 +1397,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-21" data-index="21" data-keywords="" data-techniques="" data-title="Project #22">
             <h2>Project #22</h2>
+            <button class="wishlist-btn" data-project-id="project-21" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1305,8 +1453,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-22" data-index="22" data-keywords="" data-techniques="" data-title="Project #23">
             <h2>Project #23</h2>
+            <button class="wishlist-btn" data-project-id="project-22" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1360,8 +1509,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-23" data-index="23" data-keywords="" data-techniques="" data-title="Project #24">
             <h2>Project #24</h2>
+            <button class="wishlist-btn" data-project-id="project-23" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1415,8 +1565,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-24" data-index="24" data-keywords="" data-techniques="" data-title="Project #25">
             <h2>Project #25</h2>
+            <button class="wishlist-btn" data-project-id="project-24" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1470,8 +1621,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-25" data-index="25" data-keywords="" data-techniques="" data-title="Project #26">
             <h2>Project #26</h2>
+            <button class="wishlist-btn" data-project-id="project-25" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1525,8 +1677,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-26" data-index="26" data-keywords="" data-techniques="" data-title="Project #27">
             <h2>Project #27</h2>
+            <button class="wishlist-btn" data-project-id="project-26" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1580,8 +1733,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-27" data-index="27" data-keywords="" data-techniques="" data-title="Project #28">
             <h2>Project #28</h2>
+            <button class="wishlist-btn" data-project-id="project-27" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1635,8 +1789,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-28" data-index="28" data-keywords="" data-techniques="" data-title="Project #29">
             <h2>Project #29</h2>
+            <button class="wishlist-btn" data-project-id="project-28" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1690,8 +1845,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-29" data-index="29" data-keywords="" data-techniques="" data-title="Project #30">
             <h2>Project #30</h2>
+            <button class="wishlist-btn" data-project-id="project-29" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1745,8 +1901,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-30" data-index="30" data-keywords="" data-techniques="" data-title="Project #31">
             <h2>Project #31</h2>
+            <button class="wishlist-btn" data-project-id="project-30" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1800,8 +1957,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-31" data-index="31" data-keywords="" data-techniques="" data-title="Project #32">
             <h2>Project #32</h2>
+            <button class="wishlist-btn" data-project-id="project-31" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1855,8 +2013,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-32" data-index="32" data-keywords="" data-techniques="" data-title="Project #33">
             <h2>Project #33</h2>
+            <button class="wishlist-btn" data-project-id="project-32" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1910,8 +2069,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-33" data-index="33" data-keywords="" data-techniques="" data-title="Project #34">
             <h2>Project #34</h2>
+            <button class="wishlist-btn" data-project-id="project-33" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -1965,8 +2125,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-34" data-index="34" data-keywords="" data-techniques="" data-title="Project #35">
             <h2>Project #35</h2>
+            <button class="wishlist-btn" data-project-id="project-34" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2020,8 +2181,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-35" data-index="35" data-keywords="" data-techniques="" data-title="Project #36">
             <h2>Project #36</h2>
+            <button class="wishlist-btn" data-project-id="project-35" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2075,8 +2237,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-36" data-index="36" data-keywords="" data-techniques="" data-title="Project #37">
             <h2>Project #37</h2>
+            <button class="wishlist-btn" data-project-id="project-36" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2130,8 +2293,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-37" data-index="37" data-keywords="" data-techniques="" data-title="Project #38">
             <h2>Project #38</h2>
+            <button class="wishlist-btn" data-project-id="project-37" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2185,8 +2349,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-38" data-index="38" data-keywords="" data-techniques="" data-title="Project #39">
             <h2>Project #39</h2>
+            <button class="wishlist-btn" data-project-id="project-38" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2240,8 +2405,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-39" data-index="39" data-keywords="" data-techniques="" data-title="Project #40">
             <h2>Project #40</h2>
+            <button class="wishlist-btn" data-project-id="project-39" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2295,8 +2461,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-40" data-index="40" data-keywords="" data-techniques="" data-title="Project #41">
             <h2>Project #41</h2>
+            <button class="wishlist-btn" data-project-id="project-40" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2350,8 +2517,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-41" data-index="41" data-keywords="" data-techniques="" data-title="Project #42">
             <h2>Project #42</h2>
+            <button class="wishlist-btn" data-project-id="project-41" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2405,8 +2573,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-42" data-index="42" data-keywords="" data-techniques="" data-title="Project #43">
             <h2>Project #43</h2>
+            <button class="wishlist-btn" data-project-id="project-42" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2460,8 +2629,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-43" data-index="43" data-keywords="" data-techniques="" data-title="Project #44">
             <h2>Project #44</h2>
+            <button class="wishlist-btn" data-project-id="project-43" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2515,8 +2685,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-44" data-index="44" data-keywords="" data-techniques="" data-title="Project #45">
             <h2>Project #45</h2>
+            <button class="wishlist-btn" data-project-id="project-44" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2570,8 +2741,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-45" data-index="45" data-keywords="" data-techniques="" data-title="Project #46">
             <h2>Project #46</h2>
+            <button class="wishlist-btn" data-project-id="project-45" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2625,8 +2797,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-46" data-index="46" data-keywords="" data-techniques="" data-title="Project #47">
             <h2>Project #47</h2>
+            <button class="wishlist-btn" data-project-id="project-46" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2680,8 +2853,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-47" data-index="47" data-keywords="" data-techniques="" data-title="Project #48">
             <h2>Project #48</h2>
+            <button class="wishlist-btn" data-project-id="project-47" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2735,8 +2909,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-48" data-index="48" data-keywords="" data-techniques="" data-title="Project #49">
             <h2>Project #49</h2>
+            <button class="wishlist-btn" data-project-id="project-48" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2790,8 +2965,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-49" data-index="49" data-keywords="" data-techniques="" data-title="Project #50">
             <h2>Project #50</h2>
+            <button class="wishlist-btn" data-project-id="project-49" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2845,8 +3021,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-50" data-index="50" data-keywords="" data-techniques="" data-title="Project #51">
             <h2>Project #51</h2>
+            <button class="wishlist-btn" data-project-id="project-50" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2900,8 +3077,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-51" data-index="51" data-keywords="" data-techniques="" data-title="Project #52">
             <h2>Project #52</h2>
+            <button class="wishlist-btn" data-project-id="project-51" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -2955,8 +3133,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-52" data-index="52" data-keywords="" data-techniques="" data-title="Project #53">
             <h2>Project #53</h2>
+            <button class="wishlist-btn" data-project-id="project-52" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3010,8 +3189,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-53" data-index="53" data-keywords="" data-techniques="" data-title="Project #54">
             <h2>Project #54</h2>
+            <button class="wishlist-btn" data-project-id="project-53" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3065,8 +3245,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-54" data-index="54" data-keywords="" data-techniques="" data-title="Project #55">
             <h2>Project #55</h2>
+            <button class="wishlist-btn" data-project-id="project-54" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3120,8 +3301,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-55" data-index="55" data-keywords="" data-techniques="" data-title="Project #56">
             <h2>Project #56</h2>
+            <button class="wishlist-btn" data-project-id="project-55" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3175,8 +3357,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-56" data-index="56" data-keywords="" data-techniques="" data-title="Project #57">
             <h2>Project #57</h2>
+            <button class="wishlist-btn" data-project-id="project-56" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3230,8 +3413,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-57" data-index="57" data-keywords="" data-techniques="" data-title="Project #58">
             <h2>Project #58</h2>
+            <button class="wishlist-btn" data-project-id="project-57" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3285,8 +3469,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-58" data-index="58" data-keywords="" data-techniques="" data-title="Project #59">
             <h2>Project #59</h2>
+            <button class="wishlist-btn" data-project-id="project-58" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3340,8 +3525,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-59" data-index="59" data-keywords="" data-techniques="" data-title="Project #60">
             <h2>Project #60</h2>
+            <button class="wishlist-btn" data-project-id="project-59" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3395,8 +3581,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-60" data-index="60" data-keywords="" data-techniques="" data-title="Project #61">
             <h2>Project #61</h2>
+            <button class="wishlist-btn" data-project-id="project-60" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3450,8 +3637,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-61" data-index="61" data-keywords="" data-techniques="" data-title="Project #62">
             <h2>Project #62</h2>
+            <button class="wishlist-btn" data-project-id="project-61" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3505,8 +3693,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-62" data-index="62" data-keywords="" data-techniques="" data-title="Project #63">
             <h2>Project #63</h2>
+            <button class="wishlist-btn" data-project-id="project-62" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3560,8 +3749,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-63" data-index="63" data-keywords="" data-techniques="" data-title="Project #64">
             <h2>Project #64</h2>
+            <button class="wishlist-btn" data-project-id="project-63" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3615,8 +3805,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-64" data-index="64" data-keywords="" data-techniques="" data-title="Project #65">
             <h2>Project #65</h2>
+            <button class="wishlist-btn" data-project-id="project-64" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3670,8 +3861,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-65" data-index="65" data-keywords="" data-techniques="" data-title="Project #66">
             <h2>Project #66</h2>
+            <button class="wishlist-btn" data-project-id="project-65" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3725,8 +3917,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-66" data-index="66" data-keywords="" data-techniques="" data-title="Project #67">
             <h2>Project #67</h2>
+            <button class="wishlist-btn" data-project-id="project-66" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3780,8 +3973,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-67" data-index="67" data-keywords="" data-techniques="" data-title="Project #68">
             <h2>Project #68</h2>
+            <button class="wishlist-btn" data-project-id="project-67" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3835,8 +4029,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-68" data-index="68" data-keywords="" data-techniques="" data-title="Project #69">
             <h2>Project #69</h2>
+            <button class="wishlist-btn" data-project-id="project-68" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3890,8 +4085,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-69" data-index="69" data-keywords="" data-techniques="" data-title="Project #70">
             <h2>Project #70</h2>
+            <button class="wishlist-btn" data-project-id="project-69" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -3945,8 +4141,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-70" data-index="70" data-keywords="" data-techniques="" data-title="Project #71">
             <h2>Project #71</h2>
+            <button class="wishlist-btn" data-project-id="project-70" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4000,8 +4197,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-71" data-index="71" data-keywords="" data-techniques="" data-title="Project #72">
             <h2>Project #72</h2>
+            <button class="wishlist-btn" data-project-id="project-71" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4055,8 +4253,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-72" data-index="72" data-keywords="" data-techniques="" data-title="Project #73">
             <h2>Project #73</h2>
+            <button class="wishlist-btn" data-project-id="project-72" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4110,8 +4309,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-73" data-index="73" data-keywords="" data-techniques="" data-title="Project #74">
             <h2>Project #74</h2>
+            <button class="wishlist-btn" data-project-id="project-73" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4165,8 +4365,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-74" data-index="74" data-keywords="" data-techniques="" data-title="Project #75">
             <h2>Project #75</h2>
+            <button class="wishlist-btn" data-project-id="project-74" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4220,8 +4421,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-75" data-index="75" data-keywords="" data-techniques="" data-title="Project #76">
             <h2>Project #76</h2>
+            <button class="wishlist-btn" data-project-id="project-75" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4275,8 +4477,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-76" data-index="76" data-keywords="" data-techniques="" data-title="Project #77">
             <h2>Project #77</h2>
+            <button class="wishlist-btn" data-project-id="project-76" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4330,8 +4533,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-77" data-index="77" data-keywords="" data-techniques="" data-title="Project #78">
             <h2>Project #78</h2>
+            <button class="wishlist-btn" data-project-id="project-77" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4385,8 +4589,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-78" data-index="78" data-keywords="" data-techniques="" data-title="Project #79">
             <h2>Project #79</h2>
+            <button class="wishlist-btn" data-project-id="project-78" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4440,8 +4645,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-79" data-index="79" data-keywords="" data-techniques="" data-title="Project #80">
             <h2>Project #80</h2>
+            <button class="wishlist-btn" data-project-id="project-79" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4495,8 +4701,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-80" data-index="80" data-keywords="" data-techniques="" data-title="Project #81">
             <h2>Project #81</h2>
+            <button class="wishlist-btn" data-project-id="project-80" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4550,8 +4757,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-81" data-index="81" data-keywords="" data-techniques="" data-title="Project #82">
             <h2>Project #82</h2>
+            <button class="wishlist-btn" data-project-id="project-81" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4605,8 +4813,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-82" data-index="82" data-keywords="" data-techniques="" data-title="Project #83">
             <h2>Project #83</h2>
+            <button class="wishlist-btn" data-project-id="project-82" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4660,8 +4869,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-83" data-index="83" data-keywords="" data-techniques="" data-title="Project #84">
             <h2>Project #84</h2>
+            <button class="wishlist-btn" data-project-id="project-83" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4715,8 +4925,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-84" data-index="84" data-keywords="" data-techniques="" data-title="Project #85">
             <h2>Project #85</h2>
+            <button class="wishlist-btn" data-project-id="project-84" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4770,8 +4981,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-85" data-index="85" data-keywords="" data-techniques="" data-title="Project #86">
             <h2>Project #86</h2>
+            <button class="wishlist-btn" data-project-id="project-85" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4825,8 +5037,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-86" data-index="86" data-keywords="" data-techniques="" data-title="Project #87">
             <h2>Project #87</h2>
+            <button class="wishlist-btn" data-project-id="project-86" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4880,8 +5093,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-87" data-index="87" data-keywords="" data-techniques="" data-title="Project #88">
             <h2>Project #88</h2>
+            <button class="wishlist-btn" data-project-id="project-87" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4935,8 +5149,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-88" data-index="88" data-keywords="" data-techniques="" data-title="Project #89">
             <h2>Project #89</h2>
+            <button class="wishlist-btn" data-project-id="project-88" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -4990,8 +5205,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-89" data-index="89" data-keywords="" data-techniques="" data-title="Project #90">
             <h2>Project #90</h2>
+            <button class="wishlist-btn" data-project-id="project-89" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5045,8 +5261,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-90" data-index="90" data-keywords="" data-techniques="" data-title="Project #91">
             <h2>Project #91</h2>
+            <button class="wishlist-btn" data-project-id="project-90" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5100,8 +5317,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-91" data-index="91" data-keywords="" data-techniques="" data-title="Project #92">
             <h2>Project #92</h2>
+            <button class="wishlist-btn" data-project-id="project-91" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5155,8 +5373,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-92" data-index="92" data-keywords="" data-techniques="" data-title="Project #93">
             <h2>Project #93</h2>
+            <button class="wishlist-btn" data-project-id="project-92" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5210,8 +5429,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-93" data-index="93" data-keywords="" data-techniques="" data-title="Project #94">
             <h2>Project #94</h2>
+            <button class="wishlist-btn" data-project-id="project-93" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5265,8 +5485,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-94" data-index="94" data-keywords="" data-techniques="" data-title="Project #95">
             <h2>Project #95</h2>
+            <button class="wishlist-btn" data-project-id="project-94" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5320,8 +5541,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-95" data-index="95" data-keywords="" data-techniques="" data-title="Project #96">
             <h2>Project #96</h2>
+            <button class="wishlist-btn" data-project-id="project-95" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5375,8 +5597,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-96" data-index="96" data-keywords="" data-techniques="" data-title="Project #97">
             <h2>Project #97</h2>
+            <button class="wishlist-btn" data-project-id="project-96" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5430,8 +5653,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-97" data-index="97" data-keywords="" data-techniques="" data-title="Project #98">
             <h2>Project #98</h2>
+            <button class="wishlist-btn" data-project-id="project-97" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5485,8 +5709,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-98" data-index="98" data-keywords="" data-techniques="" data-title="Project #99">
             <h2>Project #99</h2>
+            <button class="wishlist-btn" data-project-id="project-98" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5540,8 +5765,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-99" data-index="99" data-keywords="" data-techniques="" data-title="Project #100">
             <h2>Project #100</h2>
+            <button class="wishlist-btn" data-project-id="project-99" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5595,8 +5821,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-100" data-index="100" data-keywords="" data-techniques="" data-title="Project #101">
             <h2>Project #101</h2>
+            <button class="wishlist-btn" data-project-id="project-100" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5650,8 +5877,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-101" data-index="101" data-keywords="" data-techniques="" data-title="Project #102">
             <h2>Project #102</h2>
+            <button class="wishlist-btn" data-project-id="project-101" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5705,8 +5933,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-102" data-index="102" data-keywords="" data-techniques="" data-title="Project #103">
             <h2>Project #103</h2>
+            <button class="wishlist-btn" data-project-id="project-102" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5760,8 +5989,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-103" data-index="103" data-keywords="" data-techniques="" data-title="Project #104">
             <h2>Project #104</h2>
+            <button class="wishlist-btn" data-project-id="project-103" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5815,8 +6045,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-104" data-index="104" data-keywords="" data-techniques="" data-title="Project #105">
             <h2>Project #105</h2>
+            <button class="wishlist-btn" data-project-id="project-104" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5870,8 +6101,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-105" data-index="105" data-keywords="" data-techniques="" data-title="Project #106">
             <h2>Project #106</h2>
+            <button class="wishlist-btn" data-project-id="project-105" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5925,8 +6157,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-106" data-index="106" data-keywords="" data-techniques="" data-title="Project #107">
             <h2>Project #107</h2>
+            <button class="wishlist-btn" data-project-id="project-106" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -5980,8 +6213,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-107" data-index="107" data-keywords="" data-techniques="" data-title="Project #108">
             <h2>Project #108</h2>
+            <button class="wishlist-btn" data-project-id="project-107" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6035,8 +6269,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-108" data-index="108" data-keywords="" data-techniques="" data-title="Project #109">
             <h2>Project #109</h2>
+            <button class="wishlist-btn" data-project-id="project-108" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6090,8 +6325,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-109" data-index="109" data-keywords="" data-techniques="" data-title="Project #110">
             <h2>Project #110</h2>
+            <button class="wishlist-btn" data-project-id="project-109" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6145,8 +6381,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-110" data-index="110" data-keywords="" data-techniques="" data-title="Project #111">
             <h2>Project #111</h2>
+            <button class="wishlist-btn" data-project-id="project-110" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6200,8 +6437,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-111" data-index="111" data-keywords="" data-techniques="" data-title="Project #112">
             <h2>Project #112</h2>
+            <button class="wishlist-btn" data-project-id="project-111" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6255,8 +6493,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-112" data-index="112" data-keywords="" data-techniques="" data-title="Project #113">
             <h2>Project #113</h2>
+            <button class="wishlist-btn" data-project-id="project-112" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6310,8 +6549,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-113" data-index="113" data-keywords="" data-techniques="" data-title="Project #114">
             <h2>Project #114</h2>
+            <button class="wishlist-btn" data-project-id="project-113" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6365,8 +6605,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-114" data-index="114" data-keywords="" data-techniques="" data-title="Project #115">
             <h2>Project #115</h2>
+            <button class="wishlist-btn" data-project-id="project-114" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6420,8 +6661,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-115" data-index="115" data-keywords="" data-techniques="" data-title="Project #116">
             <h2>Project #116</h2>
+            <button class="wishlist-btn" data-project-id="project-115" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6475,8 +6717,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-116" data-index="116" data-keywords="" data-techniques="" data-title="Project #117">
             <h2>Project #117</h2>
+            <button class="wishlist-btn" data-project-id="project-116" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6530,8 +6773,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-117" data-index="117" data-keywords="" data-techniques="" data-title="Project #118">
             <h2>Project #118</h2>
+            <button class="wishlist-btn" data-project-id="project-117" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6585,8 +6829,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-118" data-index="118" data-keywords="" data-techniques="" data-title="Project #119">
             <h2>Project #119</h2>
+            <button class="wishlist-btn" data-project-id="project-118" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6640,8 +6885,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-119" data-index="119" data-keywords="" data-techniques="" data-title="Project #120">
             <h2>Project #120</h2>
+            <button class="wishlist-btn" data-project-id="project-119" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6695,8 +6941,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-120" data-index="120" data-keywords="" data-techniques="" data-title="Project #121">
             <h2>Project #121</h2>
+            <button class="wishlist-btn" data-project-id="project-120" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6750,8 +6997,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-121" data-index="121" data-keywords="" data-techniques="" data-title="Project #122">
             <h2>Project #122</h2>
+            <button class="wishlist-btn" data-project-id="project-121" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6805,8 +7053,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-122" data-index="122" data-keywords="" data-techniques="" data-title="Project #123">
             <h2>Project #123</h2>
+            <button class="wishlist-btn" data-project-id="project-122" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6860,8 +7109,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-123" data-index="123" data-keywords="" data-techniques="" data-title="Project #124">
             <h2>Project #124</h2>
+            <button class="wishlist-btn" data-project-id="project-123" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6915,8 +7165,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-124" data-index="124" data-keywords="" data-techniques="" data-title="Project #125">
             <h2>Project #125</h2>
+            <button class="wishlist-btn" data-project-id="project-124" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -6970,8 +7221,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-125" data-index="125" data-keywords="" data-techniques="" data-title="Project #126">
             <h2>Project #126</h2>
+            <button class="wishlist-btn" data-project-id="project-125" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7025,8 +7277,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-126" data-index="126" data-keywords="" data-techniques="" data-title="Project #127">
             <h2>Project #127</h2>
+            <button class="wishlist-btn" data-project-id="project-126" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7080,8 +7333,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-127" data-index="127" data-keywords="" data-techniques="" data-title="Project #128">
             <h2>Project #128</h2>
+            <button class="wishlist-btn" data-project-id="project-127" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7135,8 +7389,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-128" data-index="128" data-keywords="" data-techniques="" data-title="Project #129">
             <h2>Project #129</h2>
+            <button class="wishlist-btn" data-project-id="project-128" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7190,8 +7445,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-129" data-index="129" data-keywords="" data-techniques="" data-title="Project #130">
             <h2>Project #130</h2>
+            <button class="wishlist-btn" data-project-id="project-129" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7245,8 +7501,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-130" data-index="130" data-keywords="" data-techniques="" data-title="Project #131">
             <h2>Project #131</h2>
+            <button class="wishlist-btn" data-project-id="project-130" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7300,8 +7557,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-131" data-index="131" data-keywords="" data-techniques="" data-title="Project #132">
             <h2>Project #132</h2>
+            <button class="wishlist-btn" data-project-id="project-131" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7355,8 +7613,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-132" data-index="132" data-keywords="" data-techniques="" data-title="Project #133">
             <h2>Project #133</h2>
+            <button class="wishlist-btn" data-project-id="project-132" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7410,8 +7669,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-133" data-index="133" data-keywords="" data-techniques="" data-title="Project #134">
             <h2>Project #134</h2>
+            <button class="wishlist-btn" data-project-id="project-133" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7465,8 +7725,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-134" data-index="134" data-keywords="" data-techniques="" data-title="Project #135">
             <h2>Project #135</h2>
+            <button class="wishlist-btn" data-project-id="project-134" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7520,8 +7781,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-135" data-index="135" data-keywords="" data-techniques="" data-title="Project #136">
             <h2>Project #136</h2>
+            <button class="wishlist-btn" data-project-id="project-135" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7575,8 +7837,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-136" data-index="136" data-keywords="" data-techniques="" data-title="Project #137">
             <h2>Project #137</h2>
+            <button class="wishlist-btn" data-project-id="project-136" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7630,8 +7893,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-137" data-index="137" data-keywords="" data-techniques="" data-title="Project #138">
             <h2>Project #138</h2>
+            <button class="wishlist-btn" data-project-id="project-137" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7685,8 +7949,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-138" data-index="138" data-keywords="" data-techniques="" data-title="Project #139">
             <h2>Project #139</h2>
+            <button class="wishlist-btn" data-project-id="project-138" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7740,8 +8005,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-139" data-index="139" data-keywords="" data-techniques="" data-title="Project #140">
             <h2>Project #140</h2>
+            <button class="wishlist-btn" data-project-id="project-139" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7795,8 +8061,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-140" data-index="140" data-keywords="" data-techniques="" data-title="Project #141">
             <h2>Project #141</h2>
+            <button class="wishlist-btn" data-project-id="project-140" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7850,8 +8117,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-141" data-index="141" data-keywords="" data-techniques="" data-title="Project #142">
             <h2>Project #142</h2>
+            <button class="wishlist-btn" data-project-id="project-141" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7905,8 +8173,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-142" data-index="142" data-keywords="" data-techniques="" data-title="Project #143">
             <h2>Project #143</h2>
+            <button class="wishlist-btn" data-project-id="project-142" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -7960,8 +8229,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-143" data-index="143" data-keywords="" data-techniques="" data-title="Project #144">
             <h2>Project #144</h2>
+            <button class="wishlist-btn" data-project-id="project-143" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8015,8 +8285,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-144" data-index="144" data-keywords="" data-techniques="" data-title="Project #145">
             <h2>Project #145</h2>
+            <button class="wishlist-btn" data-project-id="project-144" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8070,8 +8341,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-145" data-index="145" data-keywords="" data-techniques="" data-title="Project #146">
             <h2>Project #146</h2>
+            <button class="wishlist-btn" data-project-id="project-145" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8125,8 +8397,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-146" data-index="146" data-keywords="" data-techniques="" data-title="Project #147">
             <h2>Project #147</h2>
+            <button class="wishlist-btn" data-project-id="project-146" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8180,8 +8453,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-147" data-index="147" data-keywords="" data-techniques="" data-title="Project #148">
             <h2>Project #148</h2>
+            <button class="wishlist-btn" data-project-id="project-147" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8235,8 +8509,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-148" data-index="148" data-keywords="" data-techniques="" data-title="Project #149">
             <h2>Project #149</h2>
+            <button class="wishlist-btn" data-project-id="project-148" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8290,8 +8565,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-149" data-index="149" data-keywords="" data-techniques="" data-title="Project #150">
             <h2>Project #150</h2>
+            <button class="wishlist-btn" data-project-id="project-149" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8345,8 +8621,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-150" data-index="150" data-keywords="" data-techniques="" data-title="Project #151">
             <h2>Project #151</h2>
+            <button class="wishlist-btn" data-project-id="project-150" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8400,8 +8677,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-151" data-index="151" data-keywords="" data-techniques="" data-title="Project #152">
             <h2>Project #152</h2>
+            <button class="wishlist-btn" data-project-id="project-151" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8455,8 +8733,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-152" data-index="152" data-keywords="" data-techniques="" data-title="Project #153">
             <h2>Project #153</h2>
+            <button class="wishlist-btn" data-project-id="project-152" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8510,8 +8789,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-153" data-index="153" data-keywords="" data-techniques="" data-title="Project #154">
             <h2>Project #154</h2>
+            <button class="wishlist-btn" data-project-id="project-153" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8565,8 +8845,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-154" data-index="154" data-keywords="" data-techniques="" data-title="Project #155">
             <h2>Project #155</h2>
+            <button class="wishlist-btn" data-project-id="project-154" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8620,8 +8901,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-155" data-index="155" data-keywords="" data-techniques="" data-title="Project #156">
             <h2>Project #156</h2>
+            <button class="wishlist-btn" data-project-id="project-155" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8675,8 +8957,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-156" data-index="156" data-keywords="" data-techniques="" data-title="Project #157">
             <h2>Project #157</h2>
+            <button class="wishlist-btn" data-project-id="project-156" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8730,8 +9013,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-157" data-index="157" data-keywords="" data-techniques="" data-title="Project #158">
             <h2>Project #158</h2>
+            <button class="wishlist-btn" data-project-id="project-157" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8785,8 +9069,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-158" data-index="158" data-keywords="" data-techniques="" data-title="Project #159">
             <h2>Project #159</h2>
+            <button class="wishlist-btn" data-project-id="project-158" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8840,8 +9125,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-159" data-index="159" data-keywords="" data-techniques="" data-title="Project #160">
             <h2>Project #160</h2>
+            <button class="wishlist-btn" data-project-id="project-159" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8895,8 +9181,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-160" data-index="160" data-keywords="" data-techniques="" data-title="Project #161">
             <h2>Project #161</h2>
+            <button class="wishlist-btn" data-project-id="project-160" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -8950,8 +9237,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-161" data-index="161" data-keywords="" data-techniques="" data-title="Project #162">
             <h2>Project #162</h2>
+            <button class="wishlist-btn" data-project-id="project-161" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -9005,8 +9293,9 @@
             
         </div>
         
-        <div class="project">
+        <div class="project" id="project-162" data-index="162" data-keywords="" data-techniques="" data-title="Project #163">
             <h2>Project #163</h2>
+            <button class="wishlist-btn" data-project-id="project-162" title="Add to wishlist">★</button>
         
             <div class="field">
                 <span class="field-label">Project Id:</span>
@@ -9060,6 +9349,298 @@
             
         </div>
         
+    </div>
+    
+    <div class="wishlist-container">
+        <div>
+            <span id="wishlistCount" class="wishlist-count">0</span> projects in wishlist
+        </div>
+        <div class="wishlist-buttons">
+            <button id="clearWishlistBtn" class="btn btn-secondary">Clear Wishlist</button>
+            <button id="exportWishlistBtn" class="btn btn-primary">Export Wishlist</button>
+        </div>
+    </div>
+    
+    <script>
+        // Wishlist functionality
+        let wishlist = JSON.parse(localStorage.getItem('projectWishlist')) || [];
+        
+        // Filter state
+        let currentView = 'all'; // 'all' or 'wishlist'
+        let activeFilters = {
+            keyword: [],
+            technique: [],
+            search: ''
+        };
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateWishlistUI();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Wishlist button clicks
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                btn.addEventListener('click', toggleWishlistItem);
+            });
+            
+            // View toggle buttons
+            document.getElementById('viewAllBtn').addEventListener('click', () => setView('all'));
+            document.getElementById('viewWishlistBtn').addEventListener('click', () => setView('wishlist'));
+            
+            // Wishlist actions
+            document.getElementById('clearWishlistBtn').addEventListener('click', clearWishlist);
+            document.getElementById('exportWishlistBtn').addEventListener('click', exportWishlist);
+            
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') performSearch();
+            });
+        }
+        
+        function toggleWishlistItem(e) {
+            const btn = e.currentTarget;
+            const projectId = btn.getAttribute('data-project-id');
+            const projectElement = document.getElementById(projectId);
+            const projectTitle = projectElement.querySelector('h2').textContent;
+            
+            const index = wishlist.findIndex(item => item.id === projectId);
+            
+            if (index === -1) {
+                // Add to wishlist
+                wishlist.push({
+                    id: projectId,
+                    title: projectTitle,
+                    index: projectElement.getAttribute('data-index')
+                });
+                btn.classList.add('active');
+                projectElement.classList.add('wishlist-item');
+            } else {
+                // Remove from wishlist
+                wishlist.splice(index, 1);
+                btn.classList.remove('active');
+                projectElement.classList.remove('wishlist-item');
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('projectWishlist', JSON.stringify(wishlist));
+            updateWishlistUI();
+            
+            // Update view if in wishlist mode
+            if (currentView === 'wishlist') {
+                applyFilters();
+            }
+        }
+        
+        function updateWishlistUI() {
+            // Update wishlist count
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+            
+            // Update star buttons
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                const projectId = btn.getAttribute('data-project-id');
+                const isInWishlist = wishlist.some(item => item.id === projectId);
+                
+                if (isInWishlist) {
+                    btn.classList.add('active');
+                    document.getElementById(projectId).classList.add('wishlist-item');
+                } else {
+                    btn.classList.remove('active');
+                    document.getElementById(projectId).classList.remove('wishlist-item');
+                }
+            });
+            
+            // Update view buttons
+            if (currentView === 'all') {
+                document.getElementById('viewAllBtn').classList.add('btn-primary');
+                document.getElementById('viewAllBtn').classList.remove('btn-secondary');
+                document.getElementById('viewWishlistBtn').classList.add('btn-secondary');
+                document.getElementById('viewWishlistBtn').classList.remove('btn-primary');
+            } else {
+                document.getElementById('viewAllBtn').classList.add('btn-secondary');
+                document.getElementById('viewAllBtn').classList.remove('btn-primary');
+                document.getElementById('viewWishlistBtn').classList.add('btn-primary');
+                document.getElementById('viewWishlistBtn').classList.remove('btn-secondary');
+            }
+        }
+        
+        function setView(view) {
+            currentView = view;
+            updateWishlistUI();
+            applyFilters();
+        }
+        
+        function clearWishlist() {
+            if (confirm('Are you sure you want to clear your wishlist?')) {
+                wishlist = [];
+                localStorage.setItem('projectWishlist', JSON.stringify(wishlist));
+                updateWishlistUI();
+                applyFilters();
+            }
+        }
+        
+        function exportWishlist() {
+            if (wishlist.length === 0) {
+                alert('Your wishlist is empty');
+                return;
+            }
+            
+            // Create content for export
+            let content = 'My Projects Wishlist\n\n';
+            
+            wishlist.forEach((item, index) => {
+                const projectElement = document.getElementById(item.id);
+                content += `${index + 1}. ${item.title}\n`;
+                
+                // Add details like staff, keywords, etc.
+                projectElement.querySelectorAll('.field').forEach(field => {
+                    const label = field.querySelector('.field-label');
+                    if (label && !label.textContent.includes('SUMMARY') && !label.textContent.includes('METHOD')) {
+                        const value = field.querySelector('.field-value');
+                        if (value) {
+                            content += `   ${label.textContent} ${value.textContent}\n`;
+                        }
+                    }
+                });
+                
+                content += '\n';
+            });
+            
+            // Create and download a text file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'projects_wishlist.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (searchTerm) {
+                activeFilters.search = searchTerm;
+            } else {
+                activeFilters.search = '';
+            }
+            
+            applyFilters();
+            updateFilterTags();
+        }
+        
+        function filterByTag(type, value) {
+            // Add to filters if not already present
+            if (!activeFilters[type].includes(value)) {
+                activeFilters[type].push(value);
+                applyFilters();
+                updateFilterTags();
+            }
+        }
+        
+        function removeFilter(type, value) {
+            if (type === 'search') {
+                activeFilters.search = '';
+                document.getElementById('searchInput').value = '';
+            } else {
+                const index = activeFilters[type].indexOf(value);
+                if (index !== -1) {
+                    activeFilters[type].splice(index, 1);
+                }
+            }
+            
+            applyFilters();
+            updateFilterTags();
+        }
+        
+        function updateFilterTags() {
+            const filterContainer = document.getElementById('filterTags');
+            filterContainer.innerHTML = '';
+            
+            // Add search tag if exists
+            if (activeFilters.search) {
+                const tag = document.createElement('div');
+                tag.className = 'filter-tag';
+                tag.innerHTML = `Search: ${activeFilters.search} <span class="remove" onclick="removeFilter('search', '')">×</span>`;
+                filterContainer.appendChild(tag);
+            }
+            
+            // Add keyword tags
+            activeFilters.keyword.forEach(keyword => {
+                const tag = document.createElement('div');
+                tag.className = 'filter-tag';
+                tag.innerHTML = `Keyword: ${keyword} <span class="remove" onclick="removeFilter('keyword', '${keyword}')">×</span>`;
+                filterContainer.appendChild(tag);
+            });
+            
+            // Add technique tags
+            activeFilters.technique.forEach(technique => {
+                const tag = document.createElement('div');
+                tag.className = 'filter-tag';
+                tag.innerHTML = `Technique: ${technique} <span class="remove" onclick="removeFilter('technique', '${technique}')">×</span>`;
+                filterContainer.appendChild(tag);
+            });
+        }
+        
+        function applyFilters() {
+            const projects = document.querySelectorAll('.project');
+            
+            projects.forEach(project => {
+                let showProject = true;
+                
+                // Filter by wishlist if in wishlist view
+                if (currentView === 'wishlist') {
+                    const projectId = project.id;
+                    if (!wishlist.some(item => item.id === projectId)) {
+                        showProject = false;
+                    }
+                }
+                
+                // Apply search filter
+                if (showProject && activeFilters.search) {
+                    const searchTerm = activeFilters.search.toLowerCase();
+                    const projectText = project.textContent.toLowerCase();
+                    
+                    if (!projectText.includes(searchTerm)) {
+                        showProject = false;
+                    }
+                }
+                
+                // Apply keyword filters
+                if (showProject && activeFilters.keyword.length > 0) {
+                    const projectKeywords = (project.getAttribute('data-keywords') || '').toLowerCase();
+                    
+                    const hasAllKeywords = activeFilters.keyword.every(keyword => 
+                        projectKeywords.includes(keyword.toLowerCase())
+                    );
+                    
+                    if (!hasAllKeywords) {
+                        showProject = false;
+                    }
+                }
+                
+                // Apply technique filters
+                if (showProject && activeFilters.technique.length > 0) {
+                    const projectTechniques = (project.getAttribute('data-techniques') || '').toLowerCase();
+                    
+                    const hasAllTechniques = activeFilters.technique.every(technique => 
+                        projectTechniques.includes(technique.toLowerCase())
+                    );
+                    
+                    if (!hasAllTechniques) {
+                        showProject = false;
+                    }
+                }
+                
+                // Show or hide the project
+                project.style.display = showProject ? 'block' : 'none';
+            });
+        }
+    </script>
     </body>
     </html>
     
